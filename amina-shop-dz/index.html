@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Amina Shop DZ - Boutique en ligne</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-white text-gray-800">
+  <!-- Navigation Bar -->
+  <nav class="bg-blue-700 text-white">
+    <div class="container mx-auto flex justify-between items-center p-4">
+      <a href="index.html" class="text-2xl font-bold">Amina Shop DZ</a>
+      <ul class="hidden md:flex space-x-6">
+        <li><a href="index.html" class="hover:text-gray-300">Accueil</a></li>
+        <li><a href="catalog.html" class="hover:text-gray-300">Catalogue</a></li>
+        <li><a href="cart.html" class="hover:text-gray-300"><i class="fas fa-shopping-cart"></i> Panier <span id="cart-count" class="ml-1 bg-red-600 text-white rounded-full px-2 text-xs"></span></a></li>
+        <li><a href="admin.html" class="hover:text-gray-300">Admin</a></li>
+      </ul>
+      <div class="md:hidden">
+        <button id="menu-btn" class="focus:outline-none">
+          <i class="fas fa-bars text-xl"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="hidden bg-blue-700 text-white px-4 py-2 md:hidden">
+    <a href="index.html" class="block py-2 hover:text-gray-300">Accueil</a>
+    <a href="catalog.html" class="block py-2 hover:text-gray-300">Catalogue</a>
+    <a href="cart.html" class="block py-2 hover:text-gray-300">Panier</a>
+    <a href="admin.html" class="block py-2 hover:text-gray-300">Admin</a>
+  </div>
+
+  <!-- Main Banner -->
+  <section class="relative bg-blue-600 text-white py-20 px-6 text-center">
+    <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Bienvenue chez Amina Shop DZ</h1>
+    <p class="text-lg md:text-xl max-w-2xl mx-auto">Votre boutique en ligne de vêtements en Algérie - Paiement à la livraison uniquement</p>
+  </section>
+
+  <!-- Popular Products Slider -->
+  <section class="container mx-auto py-12">
+    <h2 class="text-2xl font-bold mb-6">Produits populaires</h2>
+    <div id="popular-products" class="overflow-x-auto flex space-x-6 pb-4">
+      <!-- Product cards inserted by JS -->
+    </div>
+  </section>
+
+  <!-- New Products Section -->
+  <section class="container mx-auto py-12">
+    <h2 class="text-2xl font-bold mb-6">Nouveautés</h2>
+    <div id="new-products" class="overflow-x-auto flex space-x-6 pb-4">
+      <!-- New product cards inserted by JS -->
+    </div>
+  </section>
+
+  <!-- Promotions Section -->
+  <section class="container mx-auto py-12">
+    <h2 class="text-2xl font-bold mb-6">Promotions</h2>
+    <div id="promotions" class="overflow-x-auto flex space-x-6 pb-4">
+      <!-- Promotion product cards inserted by JS -->
+    </div>
+  </section>
+
+  <!-- Product Categories -->
+  <section class="bg-gray-100 py-12">
+    <div class="container mx-auto">
+      <h2 class="text-2xl font-bold mb-6 text-center">Catégories de produits</h2>
+      <div id="categories" class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
+        <!-- Categories inserted by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-200 text-gray-700 py-8 mt-12">
+    <div class="container mx-auto text-center">
+      <p>Contactez-nous : <a href="mailto:contact@aminashopdz.com" class="text-blue-700 hover:underline">contact@aminashopdz.com</a></p>
+      <p class="mt-2">&copy; 2024 Amina Shop DZ. Tous droits réservés.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile menu toggle
+    const menuBtn = document.getElementById('menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    menuBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+
+    // Fetch and render categories
+    async function fetchCategories() {
+      try {
+        const res = await fetch('backend/api/categories.php');
+        const categories = await res.json();
+        const categoriesContainer = document.getElementById('categories');
+        categoriesContainer.innerHTML = '';
+        categories.forEach(cat => {
+          const catElem = document.createElement('a');
+          catElem.href = `catalog.html?category=${encodeURIComponent(cat.name)}`;
+          catElem.className = 'block bg-white rounded-lg shadow-md p-6 text-center hover:bg-blue-50 transition';
+          catElem.innerHTML = `
+            <i class="fas fa-tag text-4xl text-blue-700 mb-3"></i>
+            <h3 class="text-lg font-semibold">${cat.name}</h3>
+          `;
+          categoriesContainer.appendChild(catElem);
+        });
+      } catch (error) {
+        console.error('Failed to fetch categories:', error);
+      }
+    }
+
+    // Fetch and render products for sections
+    async function fetchProducts() {
+      try {
+        const res = await fetch('backend/api/products.php');
+        const products = await res.json();
+
+        const now = new Date();
+
+        // Popular products: top 3 by price descending
+        const popularProducts = products.sort((a, b) => b.price - a.price).slice(0, 3);
+        renderProductSection('popular-products', popularProducts, now);
+
+        // New products: added in last 30 days
+        const newProducts = products.filter(p => {
+          const addedDate = new Date(p.date_added);
+          const diffDays = (now - addedDate) / (1000 * 60 * 60 * 24);
+          return diffDays <= 30;
+        });
+        renderProductSection('new-products', newProducts, now);
+
+        // Promotions
+        const promoProducts = products.filter(p => p.promotion);
+        renderProductSection('promotions', promoProducts, now);
+
+      } catch (error) {
+        console.error('Failed to fetch products:', error);
+      }
+    }
+
+    function renderProductSection(containerId, products, now) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = '';
+      products.forEach(product => {
+        const card = document.createElement('div');
+        card.className = 'min-w-[250px] bg-white rounded-lg shadow-md p-4 flex flex-col relative';
+        const addedDate = new Date(product.date_added);
+        const diffDays = (now - addedDate) / (1000 * 60 * 60 * 24);
+        const isNew = diffDays <= 30;
+        card.innerHTML = `
+          <a href="product.html?id=${product.id}">
+            <img src="${product.images && product.images.length > 0 ? product.images[0] : product.image}" alt="${product.name}" class="rounded-md mb-3" />
+            <h3 class="font-semibold text-lg">${product.name}</h3>
+          </a>
+          <p class="text-blue-700 font-bold mt-auto">${product.price} DZD</p>
+          <div class="mt-2 flex space-x-2">
+            <button data-id="${product.id}" class="add-to-cart bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition flex-1">Ajouter au panier</button>
+            <a href="product.html?id=${product.id}" class="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800 transition flex-1 text-center">Détails</a>
+          </div>
+        `;
+        if (product.promotion) {
+          card.innerHTML += `<div class="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">Promo</div>`;
+        }
+        if (isNew) {
+          card.innerHTML += `<div class="absolute top-8 right-2 bg-green-600 text-white text-xs font-bold px-2 py-1 rounded">Nouveau</div>`;
+        }
+        container.appendChild(card);
+      });
+    }
+
+    // Cart count update
+    async function updateCartCount() {
+      try {
+        const res = await fetch('backend/api/cart.php');
+        const cart = await res.json();
+        const count = cart.reduce((acc, item) => acc + item.quantity, 0);
+        const cartCountElem = document.getElementById('cart-count');
+        cartCountElem.textContent = count > 0 ? count : '';
+      } catch (error) {
+        console.error('Failed to update cart count:', error);
+      }
+    }
+
+    // Add to cart handler
+    document.body.addEventListener('click', async (e) => {
+      if (e.target.classList.contains('add-to-cart')) {
+        const productId = parseInt(e.target.getAttribute('data-id'));
+        try {
+          const res = await fetch('backend/api/cart.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: productId, quantity: 1 })
+          });
+          const data = await res.json();
+          if (data.success) {
+            alert('Produit ajouté au panier');
+            updateCartCount();
+          } else {
+            alert('Erreur lors de l\'ajout au panier');
+          }
+        } catch (error) {
+          alert('Erreur lors de l\'ajout au panier');
+          console.error(error);
+        }
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchCategories();
+      fetchProducts();
+      updateCartCount();
+    });
+  </script>
+</body>
+</html>
