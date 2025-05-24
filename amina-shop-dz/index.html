@@ -181,7 +181,18 @@
     async function updateCartCount() {
       try {
         const res = await fetch('backend/api/cart.php');
-        const cart = await res.json();
+        const text = await res.text();
+        let cart;
+        try {
+          cart = JSON.parse(text);
+        } catch (e) {
+          console.error('Failed to parse cart JSON:', e, 'Response text:', text);
+          cart = [];
+        }
+        if (!Array.isArray(cart)) {
+          console.warn('Cart data is not an array:', cart);
+          cart = [];
+        }
         const count = cart.reduce((acc, item) => acc + item.quantity, 0);
         const cartCountElem = document.getElementById('cart-count');
         cartCountElem.textContent = count > 0 ? count : '';
@@ -218,6 +229,134 @@
       fetchCategories();
       fetchProducts();
       updateCartCount();
+    });
+  </script>
+
+  <!-- Language Switcher -->
+  <div class="fixed top-4 right-4 z-50 bg-white border border-gray-300 rounded shadow p-2 flex items-center space-x-2">
+    <label for="language-select" class="sr-only">Choisir la langue</label>
+    <select id="language-select" class="border border-gray-300 rounded px-2 py-1 focus:outline-none">
+      <option value="fr">Français</option>
+      <option value="ar">العربية</option>
+    </select>
+  </div>
+
+  <script>
+    // Language translations
+    let translations = {};
+    let currentLang = localStorage.getItem('lang') || 'fr';
+
+    async function loadTranslations(lang) {
+      try {
+        const res = await fetch(`lang/${lang}.json`);
+        translations = await res.json();
+        applyTranslations();
+      } catch (error) {
+        console.error('Failed to load translations:', error);
+      }
+    }
+
+    function applyTranslations() {
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        const keys = key.split('.');
+        let text = translations;
+        keys.forEach(k => {
+          if (text) text = text[k];
+        });
+        if (text) {
+          el.textContent = text;
+        }
+      });
+      // Adjust direction for Arabic
+      if (currentLang === 'ar') {
+        document.documentElement.setAttribute('dir', 'rtl');
+        document.body.classList.add('text-right');
+      } else {
+        document.documentElement.setAttribute('dir', 'ltr');
+        document.body.classList.remove('text-right');
+      }
+    }
+
+    function changeLanguage(lang) {
+      currentLang = lang;
+      localStorage.setItem('lang', lang);
+      loadTranslations(lang);
+      fetchProducts(); // Reload products in selected language
+      updateCartCount();
+    }
+
+    document.getElementById('language-select').value = currentLang;
+    document.getElementById('language-select').addEventListener('change', e => {
+      changeLanguage(e.target.value);
+    });
+
+    // Modify fetchProducts to support translations
+    async function fetchProducts() {
+      try {
+        const res = await fetch(`backend/api/products.php?lang=${currentLang}`);
+        const products = await res.json();
+
+        const now = new Date();
+
+        // Popular products: top 3 by price descending
+        const popularProducts = products.sort((a, b) => b.price - a.price).slice(0, 3);
+        renderProductSection('popular-products', popularProducts, now);
+
+        // New products: added in last 30 days
+        const newProducts = products.filter(p => {
+          const addedDate = new Date(p.date_added);
+          const diffDays = (now - addedDate) / (1000 * 60 * 60 * 24);
+          return diffDays <= 30;
+        });
+        renderProductSection('new-products', newProducts, now);
+
+        // Promotions
+        const promoProducts = products.filter(p => p.promotion);
+        renderProductSection('promotions', promoProducts, now);
+
+      } catch (error) {
+        console.error('Failed to fetch products:', error);
+      }
+    }
+
+    // Adjust renderProductSection to use translated fields if available
+    function renderProductSection(containerId, products, now) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = '';
+      products.forEach(product => {
+        const card = document.createElement('div');
+        card.className = 'min-w-[250px] bg-white rounded-lg shadow-md p-4 flex flex-col relative';
+        const addedDate = new Date(product.date_added);
+        const diffDays = (now - addedDate) / (1000 * 60 * 60 * 24);
+        const isNew = diffDays <= 30;
+        card.innerHTML = `
+          <a href="product.html?id=${product.id}">
+            <img src="${product.images && product.images.length > 0 ? product.images[0] : product.image}" alt="${product.name}" class="rounded-md mb-3" />
+            <h3 class="font-semibold text-lg">${product.name}</h3>
+          </a>
+          <p class="text-blue-700 font-bold mt-auto">${product.price} DZD</p>
+          <div class="mt-2 flex space-x-2">
+            <button data-id="${product.id}" class="add-to-cart bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition flex-1">${translations['add_to_cart'] || 'Ajouter au panier'}</button>
+            <a href="product.html?id=${product.id}" class="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800 transition flex-1 text-center">${translations['details'] || 'Détails'}</a>
+          </div>
+        `;
+        if (product.promotion) {
+          card.innerHTML += `<div class="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">${translations['promo'] || 'Promo'}</div>`;
+        }
+        if (isNew) {
+          card.innerHTML += `<div class="absolute top-8 right-2 bg-green-600 text-white text-xs font-bold px-2 py-1 rounded">${translations['new'] || 'Nouveau'}</div>`;
+        }
+        container.appendChild(card);
+      });
+    }
+
+    // Initial load
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchCategories();
+      fetchProducts();
+      updateCartCount();
+      loadTranslations(currentLang);
     });
   </script>
 </body>
