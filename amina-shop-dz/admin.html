@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin - Amina Shop DZ</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-white text-gray-800">
+  <!-- Navigation Bar -->
+  <nav class="bg-blue-700 text-white">
+    <div class="container mx-auto flex justify-between items-center p-4">
+      <a href="index.html" class="text-2xl font-bold">Amina Shop DZ</a>
+      <ul class="hidden md:flex space-x-6 items-center">
+        <li><a href="index.html" class="hover:text-gray-300" data-i18n="nav.home">Accueil</a></li>
+        <li><a href="catalog.html" class="hover:text-gray-300" data-i18n="nav.catalog">Catalogue</a></li>
+        <li><a href="cart.html" class="hover:text-gray-300" data-i18n="nav.cart"><i class="fas fa-shopping-cart"></i> <span>Panier</span></a></li>
+        <li><a href="admin.html" class="hover:text-gray-300" data-i18n="nav.admin">Admin</a></li>
+        <li>
+          <select id="language-select" class="bg-blue-700 text-white border border-white rounded px-2 py-1 focus:outline-none">
+            <option value="fr">Français</option>
+            <option value="ar">العربية</option>
+          </select>
+        </li>
+      </ul>
+      <div class="md:hidden">
+        <button id="menu-btn" class="focus:outline-none">
+          <i class="fas fa-bars text-xl"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="hidden bg-blue-700 text-white px-4 py-2 md:hidden">
+    <a href="index.html" class="block py-2 hover:text-gray-300" data-i18n="nav.home">Accueil</a>
+    <a href="catalog.html" class="block py-2 hover:text-gray-300" data-i18n="nav.catalog">Catalogue</a>
+    <a href="cart.html" class="block py-2 hover:text-gray-300" data-i18n="nav.cart">Panier</a>
+    <a href="admin.html" class="block py-2 hover:text-gray-300" data-i18n="nav.admin">Admin</a>
+    <select id="language-select-mobile" class="bg-blue-700 text-white border border-white rounded px-2 py-1 focus:outline-none mt-2 w-full">
+      <option value="fr">Français</option>
+      <option value="ar">العربية</option>
+    </select>
+  </div>
+
+  <section class="container mx-auto py-12 max-w-5xl">
+    <h1 class="text-3xl font-bold mb-6" data-i18n="nav.admin">Admin - Gestion des produits</h1>
+
+    <form id="product-form" class="bg-white p-6 rounded-lg shadow-md mb-8 space-y-4">
+      <input type="hidden" id="product-id" />
+      <div>
+        <label for="name_fr" class="block font-semibold mb-1">Nom (Français)</label>
+        <input type="text" id="name_fr" class="w-full border border-gray-300 rounded px-3 py-2" required />
+      </div>
+      <div>
+        <label for="name_ar" class="block font-semibold mb-1">الاسم (العربية)</label>
+        <input type="text" id="name_ar" class="w-full border border-gray-300 rounded px-3 py-2" required />
+      </div>
+      <div>
+        <label for="description_fr" class="block font-semibold mb-1">Description (Français)</label>
+        <textarea id="description_fr" class="w-full border border-gray-300 rounded px-3 py-2" rows="3"></textarea>
+      </div>
+      <div>
+        <label for="description_ar" class="block font-semibold mb-1">الوصف (العربية)</label>
+        <textarea id="description_ar" class="w-full border border-gray-300 rounded px-3 py-2" rows="3"></textarea>
+      </div>
+      <div>
+        <label for="price" class="block font-semibold mb-1">Prix (DZD)</label>
+        <input type="number" id="price" class="w-full border border-gray-300 rounded px-3 py-2" step="0.01" required />
+      </div>
+      <div>
+        <label for="category_id" class="block font-semibold mb-1">Catégorie</label>
+        <select id="category_id" class="w-full border border-gray-300 rounded px-3 py-2" required>
+          <!-- Categories options inserted by JS -->
+        </select>
+      </div>
+      <div>
+        <label for="stock" class="block font-semibold mb-1">Stock</label>
+        <input type="number" id="stock" class="w-full border border-gray-300 rounded px-3 py-2" required />
+      </div>
+      <div class="flex items-center space-x-4">
+        <label><input type="checkbox" id="promotion" /> <span data-i18n="sections.promotions">Promotion</span></label>
+        <label><input type="checkbox" id="new" /> <span>Nouveau</span></label>
+      </div>
+      <div>
+        <label for="images" class="block font-semibold mb-1">Images (URLs, séparées par des virgules)</label>
+        <input type="text" id="images" class="w-full border border-gray-300 rounded px-3 py-2" />
+      </div>
+      <div>
+        <label for="sizes" class="block font-semibold mb-1">Tailles (séparées par des virgules)</label>
+        <input type="text" id="sizes" class="w-full border border-gray-300 rounded px-3 py-2" />
+      </div>
+      <div>
+        <label for="colors" class="block font-semibold mb-1">Couleurs (séparées par des virgules)</label>
+        <input type="text" id="colors" class="w-full border border-gray-300 rounded px-3 py-2" />
+      </div>
+      <button type="submit" class="bg-blue-700 text-white px-6 py-3 rounded hover:bg-blue-800 transition">Enregistrer</button>
+      <button type="button" id="reset-btn" class="ml-4 bg-gray-500 text-white px-6 py-3 rounded hover:bg-gray-600 transition">Réinitialiser</button>
+    </form>
+
+    <div id="products-list" class="space-y-4">
+      <!-- Products list inserted by JS -->
+    </div>
+  </section>
+
+  <script>
+    // Mobile menu toggle
+    const menuBtn = document.getElementById('menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    menuBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+
+    // Load translations
+    let translations = {};
+    let currentLang = localStorage.getItem('lang') || 'fr';
+
+    async function loadTranslations(lang) {
+      const response = await fetch(`lang/${lang}.json`);
+      translations = await response.json();
+      applyTranslations();
+    }
+
+    function applyTranslations() {
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        const keys = key.split('.');
+        let text = translations;
+        keys.forEach(k => {
+          if (text) text = text[k];
+        });
+        if (text) el.textContent = text;
+      });
+      // Set direction
+      if (currentLang === 'ar') {
+        document.documentElement.setAttribute('dir', 'rtl');
+        document.body.classList.add('text-right');
+      } else {
+        document.documentElement.setAttribute('dir', 'ltr');
+        document.body.classList.remove('text-right');
+      }
+    }
+
+    // Language selector
+    const langSelect = document.getElementById('language-select');
+    const langSelectMobile = document.getElementById('language-select-mobile');
+
+    langSelect.value = currentLang;
+    langSelectMobile.value = currentLang;
+
+    langSelect.addEventListener('change', (e) => {
+      changeLanguage(e.target.value);
+    });
+    langSelectMobile.addEventListener('change', (e) => {
+      changeLanguage(e.target.value);
+    });
+
+    function changeLanguage(lang) {
+      currentLang = lang;
+      localStorage.setItem('lang', lang);
+      loadTranslations(lang);
+      fetchAndRenderProducts();
+      fetchAndRenderCategories();
+    }
+
+    async function fetchCategories() {
+      try {
+        const res = await fetch('backend/api/categories.php');
+        const categories = await res.json();
+        return categories;
+      } catch (error) {
+        console.error('Failed to fetch categories:', error);
+        return [];
+      }
+    }
+
+    async function fetchProducts() {
+      try {
+        const res = await fetch('backend/api/products.php');
+        const products = await res.json();
+        return products;
+      } catch (error) {
+        console.error('Failed to fetch products:', error);
+        return [];
+      }
+    }
+
+    async function fetchAndRenderCategories() {
+      const categories = await fetchCategories();
+      const categorySelect = document.getElementById('category_id');
+      categorySelect.innerHTML = '';
+      categories.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat.id;
+        option.textContent = cat.name;
+        categorySelect.appendChild(option);
+      });
+    }
+
+    async function fetchAndRenderProducts() {
+      const products = await fetchProducts();
+      const productsList = document.getElementById('products-list');
+      productsList.innerHTML = '';
+      products.forEach(product => {
+        const productName = currentLang === 'ar' ? product.name_ar : product.name_fr;
+        const productDescription = currentLang === 'ar' ? product.description_ar : product.description_fr;
+        const productElem = document.createElement('div');
+        productElem.className = 'bg-white rounded-lg shadow-md p-4 flex justify-between items-center';
+
+        productElem.innerHTML = `
+          <div>
+            <h3 class="font-semibold text-lg">${productName}</h3>
+            <p>${productDescription}</p>
+            <p class="text-blue-700 font-bold">${product.price} DZD</p>
+          </div>
+          <div class="space-x-2">
+            <button data-id="${product.id}" class="edit-btn bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition">Modifier</button>
+            <button data-id="${product.id}" class="delete-btn bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">Supprimer</button>
+          </div>
+        `;
+        productsList.appendChild(productElem);
+      });
+      attachEventListeners();
+    }
+
+    function attachEventListeners() {
+      document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const id = e.target.getAttribute('data-id');
+          const products = await fetchProducts();
+          const product = products.find(p => p.id == id);
+          if (product) {
+            document.getElementById('product-id').value = product.id;
+            document.getElementById('name_fr').value = product.name_fr;
+            document.getElementById('name_ar').value = product.name_ar;
+            document.getElementById('description_fr').value = product.description_fr;
+            document.getElementById('description_ar').value = product.description_ar;
+            document.getElementById('price').value = product.price;
+            document.getElementById('category_id').value = product.category_id;
+            document.getElementById('stock').value = product.stock;
+            document.getElementById('promotion').checked = product.promotion == 1;
+            document.getElementById('new').checked = product.new == 1;
+            document.getElementById('images').value = product.images ? product.images.join(',') : '';
+            document.getElementById('sizes').value = product.sizes ? product.sizes.join(',') : '';
+            document.getElementById('colors').value = product.colors ? product.colors.join(',') : '';
+          }
+        });
+      });
+
+      document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const id = e.target.getAttribute('data-id');
+          if (confirm('Voulez-vous vraiment supprimer ce produit ?')) {
+            try {
+              const res = await fetch(`backend/api/products.php?id=${id}`, {
+                method: 'DELETE'
+              });
+              const data = await res.json();
+              if (data.success) {
+                fetchAndRenderProducts();
+              } else {
+                alert('Erreur lors de la suppression');
+              }
+            } catch (error) {
+              alert('Erreur lors de la suppression');
+              console.error(error);
+            }
+          }
+        });
+      });
+    }
+
+    document.getElementById('product-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('product-id').value;
+      const name_fr = document.getElementById('name_fr').value;
+      const name_ar = document.getElementById('name_ar').value;
+      const description_fr = document.getElementById('description_fr').value;
+      const description_ar = document.getElementById('description_ar').value;
+      const price = parseFloat(document.getElementById('price').value);
+      const category_id = parseInt(document.getElementById('category_id').value);
+      const stock = parseInt(document.getElementById('stock').value);
+      const promotion = document.getElementById('promotion').checked;
+      const newProduct = document.getElementById('new').checked;
+      const images = document.getElementById('images').value.split(',').map(s => s.trim()).filter(s => s);
+      const sizes = document.getElementById('sizes').value.split(',').map(s => s.trim()).filter(s => s);
+      const colors = document.getElementById('colors').value.split(',').map(s => s.trim()).filter(s => s);
+
+      const productData = {
+        name_fr,
+        name_ar,
+        description_fr,
+        description_ar,
+        price,
+        category_id,
+        stock,
+        promotion,
+        new: newProduct,
+        images,
+        sizes,
+        colors
+      };
+
+      try {
+        let res;
+        if (id) {
+          productData.id = parseInt(id);
+          res = await fetch('backend/api/products.php', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(productData)
+          });
+        } else {
+          res = await fetch('backend/api/products.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(productData)
+          });
+        }
+        const data = await res.json();
+        if (data.success) {
+          alert('Produit enregistré avec succès');
+          document.getElementById('product-form').reset();
+          document.getElementById('product-id').value = '';
+          fetchAndRenderProducts();
+        } else {
+          alert('Erreur lors de l\'enregistrement');
+        }
+      } catch (error) {
+        alert('Erreur lors de l\'enregistrement');
+        console.error(error);
+      }
+    });
+
+    document.getElementById('reset-btn').addEventListener('click', () => {
+      document.getElementById('product-form').reset();
+      document.getElementById('product-id').value = '';
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadTranslations(currentLang);
+      fetchAndRenderCategories();
+      fetchAndRenderProducts();
+    });
+  </script>
+</body>
+</html>
