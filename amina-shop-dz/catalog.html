@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Catalogue - Amina Shop DZ</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-white text-gray-800">
+  <!-- Navigation Bar -->
+  <nav class="bg-blue-700 text-white">
+    <div class="container mx-auto flex justify-between items-center p-4">
+      <a href="index.html" class="text-2xl font-bold">Amina Shop DZ</a>
+      <ul class="hidden md:flex space-x-6">
+        <li><a href="index.html" class="hover:text-gray-300">Accueil</a></li>
+        <li><a href="catalog.html" class="hover:text-gray-300">Catalogue</a></li>
+        <li><a href="cart.html" class="hover:text-gray-300"><i class="fas fa-shopping-cart"></i> Panier <span id="cart-count" class="ml-1 bg-red-600 text-white rounded-full px-2 text-xs"></span></a></li>
+        <li><a href="admin.html" class="hover:text-gray-300">Admin</a></li>
+      </ul>
+      <div class="md:hidden">
+        <button id="menu-btn" class="focus:outline-none">
+          <i class="fas fa-bars text-xl"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="hidden bg-blue-700 text-white px-4 py-2 md:hidden">
+    <a href="index.html" class="block py-2 hover:text-gray-300">Accueil</a>
+    <a href="catalog.html" class="block py-2 hover:text-gray-300">Catalogue</a>
+    <a href="cart.html" class="block py-2 hover:text-gray-300">Panier</a>
+    <a href="admin.html" class="block py-2 hover:text-gray-300">Admin</a>
+  </div>
+
+  <!-- Filters and Search -->
+  <section class="container mx-auto py-8">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 space-y-4 md:space-y-0">
+      <div>
+        <label for="category-filter" class="font-semibold mr-2">Catégorie :</label>
+        <select id="category-filter" class="border border-gray-300 rounded px-3 py-1">
+          <option value="">Toutes</option>
+          <option value="hommes">Hommes</option>
+          <option value="femmes">Femmes</option>
+          <option value="enfants">Enfants</option>
+        </select>
+      </div>
+      <div>
+        <input type="text" id="search-input" placeholder="Rechercher un produit..." class="border border-gray-300 rounded px-3 py-1 w-64" />
+      </div>
+      <div>
+        <label for="sort-select" class="font-semibold mr-2">Trier par :</label>
+        <select id="sort-select" class="border border-gray-300 rounded px-3 py-1">
+          <option value="default">Par défaut</option>
+          <option value="price-asc">Prix croissant</option>
+          <option value="price-desc">Prix décroissant</option>
+          <option value="name-asc">Nom A-Z</option>
+          <option value="name-desc">Nom Z-A</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Products Grid -->
+    <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <!-- Product cards will be inserted here by JS -->
+    </div>
+
+    <!-- Pagination -->
+    <div class="mt-8 flex justify-center space-x-4">
+      <button id="prev-page" class="px-4 py-2 bg-blue-700 text-white rounded disabled:opacity-50" disabled>Précédent</button>
+      <span id="page-info" class="self-center"></span>
+      <button id="next-page" class="px-4 py-2 bg-blue-700 text-white rounded">Suivant</button>
+    </div>
+  </section>
+
+  <script>
+    // Mobile menu toggle
+    const menuBtn = document.getElementById('menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    menuBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+
+    // Fetch and render products
+    async function fetchProducts() {
+      try {
+        const res = await fetch('backend/api/products.php');
+        const products = await res.json();
+        return products;
+      } catch (error) {
+        console.error('Failed to fetch products:', error);
+        return [];
+      }
+    }
+
+    // Fetch and render categories
+    async function fetchCategories() {
+      try {
+        const res = await fetch('backend/api/categories.php');
+        const categories = await res.json();
+        return categories;
+      } catch (error) {
+        console.error('Failed to fetch categories:', error);
+        return [];
+      }
+    }
+
+    const productsPerPage = 12;
+    let currentPage = 1;
+    let allProducts = [];
+    let filteredProducts = [];
+
+    const categoryFilter = document.getElementById('category-filter');
+    const searchInput = document.getElementById('search-input');
+    const sortSelect = document.getElementById('sort-select');
+    const productsGrid = document.getElementById('products-grid');
+    const prevPageBtn = document.getElementById('prev-page');
+    const nextPageBtn = document.getElementById('next-page');
+    const pageInfo = document.getElementById('page-info');
+
+    function filterAndSortProducts() {
+      let filtered = allProducts;
+
+      // Filter by category
+      const category = categoryFilter.value;
+      if (category) {
+        filtered = filtered.filter(p => p.category_name === category);
+      }
+
+      // Search filter
+      const searchTerm = searchInput.value.toLowerCase();
+      if (searchTerm) {
+        filtered = filtered.filter(p => p.name.toLowerCase().includes(searchTerm));
+      }
+
+      // Sort
+      const sortValue = sortSelect.value;
+      if (sortValue === 'price-asc') {
+        filtered.sort((a, b) => a.price - b.price);
+      } else if (sortValue === 'price-desc') {
+        filtered.sort((a, b) => b.price - a.price);
+      } else if (sortValue === 'name-asc') {
+        filtered.sort((a, b) => a.name.localeCompare(b.name));
+      } else if (sortValue === 'name-desc') {
+        filtered.sort((a, b) => b.name.localeCompare(a.name));
+      }
+
+      return filtered;
+    }
+
+    function renderProducts() {
+      filteredProducts = filterAndSortProducts();
+      const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+      if (currentPage > totalPages) currentPage = totalPages || 1;
+
+      const start = (currentPage - 1) * productsPerPage;
+      const end = start + productsPerPage;
+      const paginated = filteredProducts.slice(start, end);
+
+      productsGrid.innerHTML = "";
+      paginated.forEach(product => {
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-lg shadow-md p-4 flex flex-col relative';
+
+        // Create size select
+        let sizeSelectHTML = '';
+        if (product.sizes && product.sizes.length > 0) {
+          sizeSelectHTML = '<select class="size-select border border-gray-300 rounded px-2 py-1 mb-2 w-full">';
+          product.sizes.forEach(size => {
+            sizeSelectHTML += `<option value="${size}">${size}</option>`;
+          });
+          sizeSelectHTML += '</select>';
+        }
+
+        // Create color select
+        let colorSelectHTML = '';
+        if (product.colors && product.colors.length > 0) {
+          colorSelectHTML = '<select class="color-select border border-gray-300 rounded px-2 py-1 mb-2 w-full">';
+          product.colors.forEach(color => {
+            colorSelectHTML += `<option value="${color}">${color}</option>`;
+          });
+          colorSelectHTML += '</select>';
+        }
+
+        // Quantity input
+        const quantityInputHTML = '<input type="number" min="1" value="1" class="quantity-input border border-gray-300 rounded px-2 py-1 mb-2 w-full" />';
+
+        card.innerHTML = `
+          <a href="product.html?id=${product.id}">
+            <img src="${product.images && product.images.length > 0 ? product.images[0] : ''}" alt="${product.name}" class="rounded-md mb-3 w-full h-48 object-cover" />
+            <h3 class="font-semibold text-lg">${product.name}</h3>
+          </a>
+          <p class="text-blue-700 font-bold mt-auto">${product.price} DZD</p>
+          ${sizeSelectHTML}
+          ${colorSelectHTML}
+          ${quantityInputHTML}
+          <button data-id="${product.id}" class="add-to-cart bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition w-full">Ajouter au panier</button>
+          <a href="product.html?id=${product.id}" class="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800 transition mt-2 block text-center">Détails</a>
+        `;
+        if (product.promotion) {
+          card.innerHTML += `<div class="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">Promo</div>`;
+        }
+        if (product.new) {
+          card.innerHTML += `<div class="absolute top-8 right-2 bg-green-600 text-white text-xs font-bold px-2 py-1 rounded">Nouveau</div>`;
+        }
+        productsGrid.appendChild(card);
+      });
+
+      pageInfo.textContent = "Page " + currentPage + " sur " + (totalPages || 1);
+      prevPageBtn.disabled = currentPage === 1;
+      nextPageBtn.disabled = currentPage === totalPages || totalPages === 0;
+    }
+
+    categoryFilter.addEventListener('change', () => {
+      currentPage = 1;
+      renderProducts();
+    });
+
+    searchInput.addEventListener('input', () => {
+      currentPage = 1;
+      renderProducts();
+    });
+
+    sortSelect.addEventListener('change', () => {
+      currentPage = 1;
+      renderProducts();
+    });
+
+    prevPageBtn.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderProducts();
+      }
+    });
+
+    nextPageBtn.addEventListener('click', () => {
+      currentPage++;
+      renderProducts();
+    });
+
+    // Cart count update
+    async function updateCartCount() {
+      try {
+        const res = await fetch('backend/api/cart.php');
+        const cart = await res.json();
+        const count = cart.reduce((acc, item) => acc + item.quantity, 0);
+        const cartCountElem = document.getElementById('cart-count');
+        cartCountElem.textContent = count > 0 ? count : '';
+      } catch (error) {
+        console.error('Failed to update cart count:', error);
+      }
+    }
+
+    // Add to cart handler with size, color, quantity
+    document.body.addEventListener('click', async (e) => {
+      if (e.target.classList.contains('add-to-cart')) {
+        const productId = parseInt(e.target.getAttribute('data-id'));
+        const productCard = e.target.closest('.bg-white');
+        const sizeSelect = productCard.querySelector('select.size-select');
+        const colorSelect = productCard.querySelector('select.color-select');
+        const quantityInput = productCard.querySelector('input.quantity-input');
+        const selectedSize = sizeSelect ? sizeSelect.value : null;
+        const selectedColor = colorSelect ? colorSelect.value : null;
+        const quantity = quantityInput ? parseInt(quantityInput.value) || 1 : 1;
+        try {
+          const res = await fetch('backend/api/cart.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: productId, size: selectedSize, color: selectedColor, quantity: quantity })
+          });
+          const data = await res.json();
+          if (data.success) {
+            alert('Produit ajouté au panier');
+            updateCartCount();
+          } else {
+            alert('Erreur lors de l\'ajout au panier');
+          }
+        } catch (error) {
+          alert('Erreur lors de l\'ajout au panier');
+          console.error(error);
+        }
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      allProducts = await fetchProducts();
+      const categories = await fetchCategories();
+      // Populate category filter options dynamically
+      const categoryFilterElem = document.getElementById('category-filter');
+      categories.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat.name;
+        option.textContent = cat.name;
+        categoryFilterElem.appendChild(option);
+      });
+      renderProducts();
+      updateCartCount();
+    });
+  </script>
+</body>
+</html>
