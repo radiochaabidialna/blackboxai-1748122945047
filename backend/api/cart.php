@@ -14,7 +14,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 function findCartItemIndex($cart, $id, $size = null, $color = null) {
     foreach ($cart as $index => $item) {
-        if ($item['id'] == $id) {
+        if (isset($item['id']) && $item['id'] == $id) {
             // Check size and color if provided
             if (($size === null || (isset($item['size']) && $item['size'] === $size)) &&
                 ($color === null || (isset($item['color']) && $item['color'] === $color))) {
