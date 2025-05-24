@@ -11,9 +11,11 @@ app.use(bodyParser.json());
 // Import routes
 const productsRoutes = require('./routes/products');
 const categoriesRoutes = require('./routes/categories');
+const cartRoutes = require('./routes/cart');
 
 app.use('/api/products', productsRoutes);
 app.use('/api/categories', categoriesRoutes);
+app.use('/api/cart', cartRoutes);
 
 app.get('/', (req, res) => {
   res.send('Amina Shop DZ Backend API');
