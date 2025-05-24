@@ -158,15 +158,35 @@
         <p class="text-blue-700 font-bold text-xl mb-4">${product.price} DZD</p>
         ${sizesHtml}
         ${colorsHtml}
-        <button id="add-to-cart-btn" class="bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700 transition">${translations.product.add_to_cart || 'Ajouter au panier'}</button>
+        <div class="mt-4">
+          <label for="size-select" class="block font-semibold mb-1">${translations.product.size || 'Taille'}</label>
+          <select id="size-select" class="border border-gray-300 rounded px-3 py-2 w-full">
+            <option value="">${translations.product.select_size || 'Sélectionnez une taille'}</option>
+            ${product.sizes.map(size => `<option value="${size}">${size}</option>`).join('')}
+          </select>
+        </div>
+        <div class="mt-4">
+          <label for="color-select" class="block font-semibold mb-1">${translations.product.color || 'Couleur'}</label>
+          <select id="color-select" class="border border-gray-300 rounded px-3 py-2 w-full">
+            <option value="">${translations.product.select_color || 'Sélectionnez une couleur'}</option>
+            ${product.colors.map(color => `<option value="${color}">${color}</option>`).join('')}
+          </select>
+        </div>
+        <button id="add-to-cart-btn" class="bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700 transition mt-4">${translations.product.add_to_cart || 'Ajouter au panier'}</button>
       `;
 
       document.getElementById('add-to-cart-btn').addEventListener('click', async () => {
+        const selectedSize = document.getElementById('size-select').value;
+        const selectedColor = document.getElementById('color-select').value;
+        if (!selectedSize || !selectedColor) {
+          alert(currentLang === 'ar' ? 'يرجى اختيار الحجم واللون' : 'Veuillez sélectionner la taille et la couleur');
+          return;
+        }
         try {
           const res = await fetch('backend/api/cart.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: product.id, quantity: 1 })
+            body: JSON.stringify({ id: product.id, quantity: 1, size: selectedSize, color: selectedColor })
           });
           const data = await res.json();
           if (data.success) {
@@ -189,7 +209,9 @@
         const cart = await res.json();
         const count = cart.reduce((acc, item) => acc + item.quantity, 0);
         const cartCountElem = document.getElementById('cart-count');
-        cartCountElem.textContent = count > 0 ? count : '';
+        if (cartCountElem) {
+          cartCountElem.textContent = count > 0 ? count : '';
+        }
       } catch (error) {
         console.error('Failed to update cart count:', error);
       }
