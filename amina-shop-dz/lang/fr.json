@@ -1,0 +1,33 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "catalog": "Catalogue",
+    "cart": "Panier",
+    "admin": "Admin",
+    "language": "Langue"
+  },
+  "banner": {
+    "welcome": "Bienvenue chez Amina Shop DZ",
+    "description": "Votre boutique en ligne de vêtements en Algérie - Paiement à la livraison uniquement"
+  },
+  "sections": {
+    "popular_products": "Produits populaires",
+    "new_products": "Nouveautés",
+    "promotions": "Promotions",
+    "categories": "Catégories de produits",
+    "contact": "Contactez-nous",
+    "rights": "Tous droits réservés."
+  },
+  "cart": {
+    "added": "Produit ajouté au panier",
+    "error": "Erreur lors de l'ajout au panier"
+  },
+  "product": {
+    "details": "Détails du produit",
+    "sizes": "Tailles :",
+    "colors": "Couleurs :",
+    "quantity": "Quantité :",
+    "add_to_cart": "Ajouter au panier",
+    "not_found": "Produit non trouvé."
+  }
+}
