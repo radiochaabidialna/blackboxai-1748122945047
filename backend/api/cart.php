@@ -1,90 +1,105 @@
 <?php
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST, DELETE");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
 
 session_start();
 
-if (!isset($_SESSION['cart'])) {
-    $_SESSION['cart'] = [];
+$servername = "localhost";
+$username = "root";
+$password = ""; // Set your MySQL password
+$dbname = "aminashopdz";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+if ($conn->connect_error) {
+    http_response_code(500);
+    echo json_encode(["error" => "Connection failed: " . $conn->connect_error]);
+    exit();
 }
 
-$method = $_SERVER['REQUEST_METHOD'];
+switch ($_SERVER['REQUEST_METHOD']) {
+    case 'GET':
+        $sql = "SELECT * FROM cart";
+        $result = $conn->query($sql);
+        $cart = [];
+        while ($row = $result->fetch_assoc()) {
+            $cart[] = $row;
+        }
+        echo json_encode($cart);
+        break;
 
-function findCartItemIndex($cart, $id, $size = null, $color = null) {
-    foreach ($cart as $index => $item) {
-        if (isset($item['id']) && $item['id'] == $id) {
-            // Check size and color if provided
-            if (($size === null || (isset($item['size']) && $item['size'] === $size)) &&
-                ($color === null || (isset($item['color']) && $item['color'] === $color))) {
-                return $index;
+    case 'POST':
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!isset($data['id']) || !isset($data['size']) || !isset($data['color']) || !isset($data['quantity'])) {
+            http_response_code(400);
+            echo json_encode(["error" => "Missing required fields"]);
+            exit();
+        }
+        $id = intval($data['id']);
+        $size = $conn->real_escape_string($data['size']);
+        $color = $conn->real_escape_string($data['color']);
+        $quantity = intval($data['quantity']);
+
+        // Check if item already in cart
+        $stmt = $conn->prepare("SELECT quantity FROM cart WHERE product_id=? AND size=? AND color=?");
+        $stmt->bind_param("iss", $id, $size, $color);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($existing_quantity);
+            $stmt->fetch();
+            $new_quantity = $existing_quantity + $quantity;
+            $update_stmt = $conn->prepare("UPDATE cart SET quantity=? WHERE product_id=? AND size=? AND color=?");
+            $update_stmt->bind_param("iiss", $new_quantity, $id, $size, $color);
+            if ($update_stmt->execute()) {
+                echo json_encode(["success" => true]);
+            } else {
+                http_response_code(500);
+                echo json_encode(["error" => "Failed to update cart"]);
+            }
+        } else {
+            $insert_stmt = $conn->prepare("INSERT INTO cart (product_id, size, color, quantity) VALUES (?, ?, ?, ?)");
+            $insert_stmt->bind_param("issi", $id, $size, $color, $quantity);
+            if ($insert_stmt->execute()) {
+                echo json_encode(["success" => true]);
+            } else {
+                http_response_code(500);
+                echo json_encode(["error" => "Failed to add to cart"]);
             }
         }
-    }
-    return -1;
+        break;
+
+    case 'DELETE':
+        // Require id, size, and color to delete a specific cart item
+        if (!isset($_GET['id']) || !isset($_GET['size']) || !isset($_GET['color'])) {
+            http_response_code(400);
+            echo json_encode(["error" => "Missing id, size or color"]);
+            exit();
+        }
+        $id = intval($_GET['id']);
+        $size = $conn->real_escape_string($_GET['size']);
+        $color = $conn->real_escape_string($_GET['color']);
+        $stmt = $conn->prepare("DELETE FROM cart WHERE product_id=? AND size=? AND color=?");
+        $stmt->bind_param("iss", $id, $size, $color);
+        if ($stmt->execute()) {
+            echo json_encode(["success" => true]);
+        } else {
+            http_response_code(500);
+            echo json_encode(["error" => "Failed to delete from cart"]);
+        }
+        break;
+
+    default:
+        http_response_code(405);
+        echo json_encode(["error" => "Method not allowed"]);
+        break;
 }
 
-if ($method === 'GET') {
-    echo json_encode($_SESSION['cart']);
-} elseif ($method === 'POST') {
-    $data = json_decode(file_get_contents('php://input'), true);
-    if (!isset($data['id']) || !isset($data['quantity'])) {
-        http_response_code(400);
-        echo json_encode(["error" => "Invalid input"]);
-        exit();
-    }
-    $id = $data['id'];
-    $quantity = max(1, intval($data['quantity']));
-    $size = isset($data['size']) ? $data['size'] : null;
-    $color = isset($data['color']) ? $data['color'] : null;
-
-    $index = findCartItemIndex($_SESSION['cart'], $id, $size, $color);
-    if ($index >= 0) {
-        // Update existing item quantity and attributes
-        $_SESSION['cart'][$index]['quantity'] = $quantity;
-        if ($size !== null) {
-            $_SESSION['cart'][$index]['size'] = $size;
-        }
-        if ($color !== null) {
-            $_SESSION['cart'][$index]['color'] = $color;
-        }
-    } else {
-        // Add new item
-        $item = [
-            'id' => $id,
-            'quantity' => $quantity,
-        ];
-        if ($size !== null) {
-            $item['size'] = $size;
-        }
-        if ($color !== null) {
-            $item['color'] = $color;
-        }
-        $_SESSION['cart'][] = $item;
-    }
-    echo json_encode(["success" => true]);
-} elseif ($method === 'DELETE') {
-    parse_str(file_get_contents("php://input"), $delete_vars);
-    if (!isset($delete_vars['id'])) {
-        http_response_code(400);
-        echo json_encode(["error" => "Invalid input"]);
-        exit();
-    }
-    $id = $delete_vars['id'];
-    $size = isset($delete_vars['size']) ? $delete_vars['size'] : null;
-    $color = isset($delete_vars['color']) ? $delete_vars['color'] : null;
-
-    $index = findCartItemIndex($_SESSION['cart'], $id, $size, $color);
-    if ($index >= 0) {
-        array_splice($_SESSION['cart'], $index, 1);
-        echo json_encode(["success" => true]);
-    } else {
-        http_response_code(404);
-        echo json_encode(["error" => "Item not found in cart"]);
-    }
-} else {
-    http_response_code(405);
-    echo json_encode(["error" => "Method not allowed"]);
-}
+$conn->close();
 ?>
