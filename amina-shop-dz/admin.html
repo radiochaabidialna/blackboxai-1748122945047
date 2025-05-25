@@ -50,304 +50,506 @@
     </select>
   </div>
 
-  <section class="container mx-auto py-12 max-w-5xl">
-    <h1 class="text-3xl font-bold mb-6" data-i18n="nav.admin">Admin - Gestion des produits</h1>
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-gray-800 text-white flex flex-col">
+      <div class="p-6 text-2xl font-bold border-b border-gray-700">Admin Dashboard</div>
+      <nav class="flex-1 px-4 py-6 space-y-4">
+        <button id="nav-products" class="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition">Produits</button>
+        <button id="nav-categories" class="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition">Catégories</button>
+        <button id="nav-orders" class="w-full text-left px-4 py-2 rounded hover:bg-gray-700 transition">Commandes</button>
+      </nav>
+    </aside>
 
-    <form id="product-form" class="bg-white p-6 rounded-lg shadow-md mb-8 space-y-4">
-      <input type="hidden" id="product-id" />
-      <div>
-        <label for="name_fr" class="block font-semibold mb-1">Nom (Français)</label>
-        <input type="text" id="name_fr" class="w-full border border-gray-300 rounded px-3 py-2" required />
-      </div>
-      <div>
-        <label for="name_ar" class="block font-semibold mb-1">الاسم (العربية)</label>
-        <input type="text" id="name_ar" class="w-full border border-gray-300 rounded px-3 py-2" required />
-      </div>
-      <div>
-        <label for="description_fr" class="block font-semibold mb-1">Description (Français)</label>
-        <textarea id="description_fr" class="w-full border border-gray-300 rounded px-3 py-2" rows="3"></textarea>
-      </div>
-      <div>
-        <label for="description_ar" class="block font-semibold mb-1">الوصف (العربية)</label>
-        <textarea id="description_ar" class="w-full border border-gray-300 rounded px-3 py-2" rows="3"></textarea>
-      </div>
-      <div>
-        <label for="price" class="block font-semibold mb-1">Prix (DZD)</label>
-        <input type="number" id="price" class="w-full border border-gray-300 rounded px-3 py-2" step="0.01" required />
-      </div>
-      <div>
-        <label for="category_id" class="block font-semibold mb-1">Catégorie</label>
-        <select id="category_id" class="w-full border border-gray-300 rounded px-3 py-2" required>
-          <!-- Categories options inserted by JS -->
-        </select>
-      </div>
-      <div>
-        <label for="stock" class="block font-semibold mb-1">Stock</label>
-        <input type="number" id="stock" class="w-full border border-gray-300 rounded px-3 py-2" required />
-      </div>
-      <div class="flex items-center space-x-4">
-        <label><input type="checkbox" id="promotion" /> <span data-i18n="sections.promotions">Promotion</span></label>
-        <label><input type="checkbox" id="new" /> <span>Nouveau</span></label>
-      </div>
-      <div>
-        <label for="images" class="block font-semibold mb-1">Images (URLs, séparées par des virgules)</label>
-        <input type="text" id="images" class="w-full border border-gray-300 rounded px-3 py-2" />
-      </div>
-      <div>
-        <label for="sizes" class="block font-semibold mb-1">Tailles (séparées par des virgules)</label>
-        <input type="text" id="sizes" class="w-full border border-gray-300 rounded px-3 py-2" />
-      </div>
-      <div>
-        <label for="colors" class="block font-semibold mb-1">Couleurs (séparées par des virgules)</label>
-        <input type="text" id="colors" class="w-full border border-gray-300 rounded px-3 py-2" />
-      </div>
-      <button type="submit" class="bg-blue-700 text-white px-6 py-3 rounded hover:bg-blue-800 transition">Enregistrer</button>
-      <button type="button" id="reset-btn" class="ml-4 bg-gray-500 text-white px-6 py-3 rounded hover:bg-gray-600 transition">Réinitialiser</button>
-    </form>
+    <!-- Main content -->
+    <main class="flex-1 p-8 overflow-auto">
+      <div id="section-products" class="hidden">
+        <h1 class="text-3xl font-bold mb-6">Gestion des produits</h1>
+        <form id="product-form" class="bg-white p-6 rounded-lg shadow-md mb-8 space-y-4 max-w-3xl">
+          <input type="hidden" id="product-id" />
+          <div>
+            <label for="name_fr" class="block font-semibold mb-1">Nom (Français)</label>
+            <input type="text" id="name_fr" class="w-full border border-gray-300 rounded px-3 py-2" required />
+          </div>
+          <div>
+            <label for="name_ar" class="block font-semibold mb-1">الاسم (العربية)</label>
+            <input type="text" id="name_ar" class="w-full border border-gray-300 rounded px-3 py-2" required />
+          </div>
+          <div>
+            <label for="description_fr" class="block font-semibold mb-1">Description (Français)</label>
+            <textarea id="description_fr" class="w-full border border-gray-300 rounded px-3 py-2" rows="3"></textarea>
+          </div>
+          <div>
+            <label for="description_ar" class="block font-semibold mb-1">الوصف (العربية)</label>
+            <textarea id="description_ar" class="w-full border border-gray-300 rounded px-3 py-2" rows="3"></textarea>
+          </div>
+          <div>
+            <label for="price" class="block font-semibold mb-1">Prix (DZD)</label>
+            <input type="number" id="price" class="w-full border border-gray-300 rounded px-3 py-2" step="0.01" required />
+          </div>
+          <div>
+            <label for="category_id" class="block font-semibold mb-1">Catégorie</label>
+            <select id="category_id" class="w-full border border-gray-300 rounded px-3 py-2" required>
+              <!-- Categories options inserted by JS -->
+            </select>
+          </div>
+          <div>
+            <label for="stock" class="block font-semibold mb-1">Stock</label>
+            <input type="number" id="stock" class="w-full border border-gray-300 rounded px-3 py-2" required />
+          </div>
+          <div class="flex items-center space-x-4">
+            <label><input type="checkbox" id="promotion" /> <span>Promotion</span></label>
+            <label><input type="checkbox" id="new" /> <span>Nouveau</span></label>
+          </div>
+          <div>
+            <label for="images" class="block font-semibold mb-1">Images (URLs, séparées par des virgules)</label>
+            <input type="text" id="images" class="w-full border border-gray-300 rounded px-3 py-2" />
+          </div>
+          <div>
+            <label for="sizes" class="block font-semibold mb-1">Tailles (séparées par des virgules)</label>
+            <input type="text" id="sizes" class="w-full border border-gray-300 rounded px-3 py-2" />
+          </div>
+          <div>
+            <label for="colors" class="block font-semibold mb-1">Couleurs (séparées par des virgules)</label>
+            <input type="text" id="colors" class="w-full border border-gray-300 rounded px-3 py-2" />
+          </div>
+          <button type="submit" class="bg-blue-700 text-white px-6 py-3 rounded hover:bg-blue-800 transition">Enregistrer</button>
+          <button type="button" id="reset-btn" class="ml-4 bg-gray-500 text-white px-6 py-3 rounded hover:bg-gray-600 transition">Réinitialiser</button>
+        </form>
 
-    <div id="products-list" class="space-y-4">
-      <!-- Products list inserted by JS -->
-    </div>
-  </section>
+        <div id="products-list" class="space-y-4">
+          <!-- Products list inserted by JS -->
+        </div>
+      </div>
+
+      <div id="section-categories" class="hidden">
+        <h1 class="text-3xl font-bold mb-6">Gestion des catégories</h1>
+        <form id="category-form" class="bg-white p-6 rounded-lg shadow-md mb-8 space-y-4 max-w-3xl">
+          <input type="hidden" id="category-id" />
+          <div>
+            <label for="category-name" class="block font-semibold mb-1">Nom de la catégorie</label>
+            <input type="text" id="category-name" class="w-full border border-gray-300 rounded px-3 py-2" required />
+          </div>
+          <button type="submit" class="bg-blue-700 text-white px-6 py-3 rounded hover:bg-blue-800 transition">Enregistrer</button>
+          <button type="button" id="reset-category-btn" class="ml-4 bg-gray-500 text-white px-6 py-3 rounded hover:bg-gray-600 transition">Réinitialiser</button>
+        </form>
+
+        <div id="categories-list" class="space-y-4">
+          <!-- Categories list inserted by JS -->
+        </div>
+      </div>
+
+      <div id="section-orders" class="hidden">
+        <h1 class="text-3xl font-bold mb-6">Gestion des commandes</h1>
+        <div id="orders-list" class="space-y-4">
+          <!-- Orders list inserted by JS -->
+        </div>
+      </div>
+    </main>
+  </div>
 
   <script>
-    // Mobile menu toggle
-    const menuBtn = document.getElementById('menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-    menuBtn.addEventListener('click', () => {
-      mobileMenu.classList.toggle('hidden');
-    });
-
-    // Load translations
-    let translations = {};
-    let currentLang = localStorage.getItem('lang') || 'fr';
-
-    async function loadTranslations(lang) {
-      const response = await fetch(`lang/${lang}.json`);
-      translations = await response.json();
-      applyTranslations();
-    }
-
-    function applyTranslations() {
-      document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        const keys = key.split('.');
-        let text = translations;
-        keys.forEach(k => {
-          if (text) text = text[k];
-        });
-        if (text) el.textContent = text;
-      });
-      // Set direction
-      if (currentLang === 'ar') {
-        document.documentElement.setAttribute('dir', 'rtl');
-        document.body.classList.add('text-right');
-      } else {
-        document.documentElement.setAttribute('dir', 'ltr');
-        document.body.classList.remove('text-right');
-      }
-    }
-
-    // Language selector
-    const langSelect = document.getElementById('language-select');
-    const langSelectMobile = document.getElementById('language-select-mobile');
-
-    langSelect.value = currentLang;
-    langSelectMobile.value = currentLang;
-
-    langSelect.addEventListener('change', (e) => {
-      changeLanguage(e.target.value);
-    });
-    langSelectMobile.addEventListener('change', (e) => {
-      changeLanguage(e.target.value);
-    });
-
-    function changeLanguage(lang) {
-      currentLang = lang;
-      localStorage.setItem('lang', lang);
-      loadTranslations(lang);
-      fetchAndRenderProducts();
-      fetchAndRenderCategories();
-    }
-
-    async function fetchCategories() {
-      try {
-        const res = await fetch('backend/api/categories.php');
-        const categories = await res.json();
-        return categories;
-      } catch (error) {
-        console.error('Failed to fetch categories:', error);
-        return [];
-      }
-    }
-
-    async function fetchProducts() {
-      try {
-        const res = await fetch('backend/api/products.php');
-        const products = await res.json();
-        return products;
-      } catch (error) {
-        console.error('Failed to fetch products:', error);
-        return [];
-      }
-    }
-
-    async function fetchAndRenderCategories() {
-      const categories = await fetchCategories();
-      const categorySelect = document.getElementById('category_id');
-      categorySelect.innerHTML = '';
-      categories.forEach(cat => {
-        const option = document.createElement('option');
-        option.value = cat.id;
-        option.textContent = cat.name;
-        categorySelect.appendChild(option);
-      });
-    }
-
-    async function fetchAndRenderProducts() {
-      const products = await fetchProducts();
-      const productsList = document.getElementById('products-list');
-      productsList.innerHTML = '';
-      products.forEach(product => {
-        const productName = currentLang === 'ar' ? product.name_ar : product.name_fr;
-        const productDescription = currentLang === 'ar' ? product.description_ar : product.description_fr;
-        const productElem = document.createElement('div');
-        productElem.className = 'bg-white rounded-lg shadow-md p-4 flex justify-between items-center';
-
-        productElem.innerHTML = `
-          <div>
-            <h3 class="font-semibold text-lg">${productName}</h3>
-            <p>${productDescription}</p>
-            <p class="text-blue-700 font-bold">${product.price} DZD</p>
-          </div>
-          <div class="space-x-2">
-            <button data-id="${product.id}" class="edit-btn bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition">Modifier</button>
-            <button data-id="${product.id}" class="delete-btn bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">Supprimer</button>
-          </div>
-        `;
-        productsList.appendChild(productElem);
-      });
-      attachEventListeners();
-    }
-
-    function attachEventListeners() {
-      document.querySelectorAll('.edit-btn').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-          const id = e.target.getAttribute('data-id');
-          const products = await fetchProducts();
-          const product = products.find(p => p.id == id);
-          if (product) {
-            document.getElementById('product-id').value = product.id;
-            document.getElementById('name_fr').value = product.name_fr;
-            document.getElementById('name_ar').value = product.name_ar;
-            document.getElementById('description_fr').value = product.description_fr;
-            document.getElementById('description_ar').value = product.description_ar;
-            document.getElementById('price').value = product.price;
-            document.getElementById('category_id').value = product.category_id;
-            document.getElementById('stock').value = product.stock;
-            document.getElementById('promotion').checked = product.promotion == 1;
-            document.getElementById('new').checked = product.new == 1;
-            document.getElementById('images').value = product.images ? product.images.join(',') : '';
-            document.getElementById('sizes').value = product.sizes ? product.sizes.join(',') : '';
-            document.getElementById('colors').value = product.colors ? product.colors.join(',') : '';
-          }
-        });
-      });
-
-      document.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-          const id = e.target.getAttribute('data-id');
-          if (confirm('Voulez-vous vraiment supprimer ce produit ?')) {
-            try {
-              const res = await fetch(`backend/api/products.php?id=${id}`, {
-                method: 'DELETE'
-              });
-              const data = await res.json();
-              if (data.success) {
-                fetchAndRenderProducts();
-              } else {
-                alert('Erreur lors de la suppression');
-              }
-            } catch (error) {
-              alert('Erreur lors de la suppression');
-              console.error(error);
-            }
-          }
-        });
-      });
-    }
-
-    document.getElementById('product-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const id = document.getElementById('product-id').value;
-      const name_fr = document.getElementById('name_fr').value;
-      const name_ar = document.getElementById('name_ar').value;
-      const description_fr = document.getElementById('description_fr').value;
-      const description_ar = document.getElementById('description_ar').value;
-      const price = parseFloat(document.getElementById('price').value);
-      const category_id = parseInt(document.getElementById('category_id').value);
-      const stock = parseInt(document.getElementById('stock').value);
-      const promotion = document.getElementById('promotion').checked;
-      const newProduct = document.getElementById('new').checked;
-      const images = document.getElementById('images').value.split(',').map(s => s.trim()).filter(s => s);
-      const sizes = document.getElementById('sizes').value.split(',').map(s => s.trim()).filter(s => s);
-      const colors = document.getElementById('colors').value.split(',').map(s => s.trim()).filter(s => s);
-
-      const productData = {
-        name_fr,
-        name_ar,
-        description_fr,
-        description_ar,
-        price,
-        category_id,
-        stock,
-        promotion,
-        new: newProduct,
-        images,
-        sizes,
-        colors
-      };
-
-      try {
-        let res;
-        if (id) {
-          productData.id = parseInt(id);
-          res = await fetch('backend/api/products.php', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(productData)
-          });
-        } else {
-          res = await fetch('backend/api/products.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(productData)
-          });
-        }
-        const data = await res.json();
-        if (data.success) {
-          alert('Produit enregistré avec succès');
-          document.getElementById('product-form').reset();
-          document.getElementById('product-id').value = '';
-          fetchAndRenderProducts();
-        } else {
-          alert('Erreur lors de l\'enregistrement');
-        }
-      } catch (error) {
-        alert('Erreur lors de l\'enregistrement');
-        console.error(error);
-      }
-    });
-
-    document.getElementById('reset-btn').addEventListener('click', () => {
-      document.getElementById('product-form').reset();
-      document.getElementById('product-id').value = '';
-    });
-
+    // Sidebar navigation logic
     document.addEventListener('DOMContentLoaded', () => {
-      loadTranslations(currentLang);
-      fetchAndRenderCategories();
-      fetchAndRenderProducts();
+      const sectionProducts = document.getElementById('section-products');
+      const sectionCategories = document.getElementById('section-categories');
+      const sectionOrders = document.getElementById('section-orders');
+
+      const navProducts = document.getElementById('nav-products');
+      const navCategories = document.getElementById('nav-categories');
+      const navOrders = document.getElementById('nav-orders');
+
+      function hideAllSections() {
+        sectionProducts.classList.add('hidden');
+        sectionCategories.classList.add('hidden');
+        sectionOrders.classList.add('hidden');
+      }
+
+      function activateNavButton(button) {
+        navProducts.classList.remove('bg-gray-700');
+        navCategories.classList.remove('bg-gray-700');
+        navOrders.classList.remove('bg-gray-700');
+        button.classList.add('bg-gray-700');
+      }
+
+      navProducts.addEventListener('click', () => {
+        hideAllSections();
+        sectionProducts.classList.remove('hidden');
+        activateNavButton(navProducts);
+        fetchAndRenderProducts();
+        fetchAndRenderCategories();
+      });
+
+      navCategories.addEventListener('click', () => {
+        hideAllSections();
+        sectionCategories.classList.remove('hidden');
+        activateNavButton(navCategories);
+        fetchAndRenderCategories();
+      });
+
+      navOrders.addEventListener('click', () => {
+        hideAllSections();
+        sectionOrders.classList.remove('hidden');
+        activateNavButton(navOrders);
+        fetchAndRenderOrders();
+      });
+
+      // Initialize with products section active
+      navProducts.click();
+
+      // Fetch and render products
+      async function fetchProducts() {
+        try {
+          const res = await fetch('backend/api/products.php');
+          const products = await res.json();
+          return products;
+        } catch (error) {
+          console.error('Failed to fetch products:', error);
+          return [];
+        }
+      }
+
+      async function fetchAndRenderProducts() {
+        const products = await fetchProducts();
+        const productsList = document.getElementById('products-list');
+        productsList.innerHTML = '';
+        products.forEach(product => {
+          const productName = product.name_fr;
+          const productDescription = product.description_fr;
+          const productElem = document.createElement('div');
+          productElem.className = 'bg-white rounded-lg shadow-md p-4 flex justify-between items-center';
+
+          productElem.innerHTML = `
+            <div>
+              <h3 class="font-semibold text-lg">${productName}</h3>
+              <p>${productDescription}</p>
+              <p class="text-blue-700 font-bold">${product.price} DZD</p>
+            </div>
+            <div class="space-x-2">
+              <button data-id="${product.id}" class="edit-btn bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition">Modifier</button>
+              <button data-id="${product.id}" class="delete-btn bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">Supprimer</button>
+            </div>
+          `;
+          productsList.appendChild(productElem);
+        });
+        attachProductEventListeners();
+      }
+
+      function attachProductEventListeners() {
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            const id = e.target.getAttribute('data-id');
+            const products = await fetchProducts();
+            const product = products.find(p => p.id == id);
+            if (product) {
+              document.getElementById('product-id').value = product.id;
+              document.getElementById('name_fr').value = product.name_fr;
+              document.getElementById('name_ar').value = product.name_ar;
+              document.getElementById('description_fr').value = product.description_fr;
+              document.getElementById('description_ar').value = product.description_ar;
+              document.getElementById('price').value = product.price;
+              document.getElementById('category_id').value = product.category_id;
+              document.getElementById('stock').value = product.stock;
+              document.getElementById('promotion').checked = product.promotion == 1;
+              document.getElementById('new').checked = product.new == 1;
+              document.getElementById('images').value = product.images ? product.images.join(',') : '';
+              document.getElementById('sizes').value = product.sizes ? product.sizes.join(',') : '';
+              document.getElementById('colors').value = product.colors ? product.colors.join(',') : '';
+            }
+          });
+        });
+
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            const id = e.target.getAttribute('data-id');
+            if (confirm('Voulez-vous vraiment supprimer ce produit ?')) {
+              try {
+                const res = await fetch(`backend/api/products.php?id=${id}`, {
+                  method: 'DELETE'
+                });
+                const data = await res.json();
+                if (data.success) {
+                  fetchAndRenderProducts();
+                } else {
+                  alert('Erreur lors de la suppression');
+                }
+              } catch (error) {
+                alert('Erreur lors de la suppression');
+                console.error(error);
+              }
+            }
+          });
+        });
+      }
+
+      document.getElementById('product-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('product-id').value;
+        const name_fr = document.getElementById('name_fr').value;
+        const name_ar = document.getElementById('name_ar').value;
+        const description_fr = document.getElementById('description_fr').value;
+        const description_ar = document.getElementById('description_ar').value;
+        const price = parseFloat(document.getElementById('price').value);
+        const category_id = parseInt(document.getElementById('category_id').value);
+        const stock = parseInt(document.getElementById('stock').value);
+        const promotion = document.getElementById('promotion').checked;
+        const newProduct = document.getElementById('new').checked;
+        const images = document.getElementById('images').value.split(',').map(s => s.trim()).filter(s => s);
+        const sizes = document.getElementById('sizes').value.split(',').map(s => s.trim()).filter(s => s);
+        const colors = document.getElementById('colors').value.split(',').map(s => s.trim()).filter(s => s);
+
+        const productData = {
+          name_fr,
+          name_ar,
+          description_fr,
+          description_ar,
+          price,
+          category_id,
+          stock,
+          promotion,
+          new: newProduct,
+          images,
+          sizes,
+          colors
+        };
+
+        try {
+          let res;
+          if (id) {
+            productData.id = parseInt(id);
+            res = await fetch('backend/api/products.php', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(productData)
+            });
+          } else {
+            res = await fetch('backend/api/products.php', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(productData)
+            });
+          }
+          const data = await res.json();
+          if (data.success) {
+            alert('Produit enregistré avec succès');
+            document.getElementById('product-form').reset();
+            document.getElementById('product-id').value = '';
+            fetchAndRenderProducts();
+          } else {
+            alert('Erreur lors de l\'enregistrement');
+          }
+        } catch (error) {
+          alert('Erreur lors de l\'enregistrement');
+          console.error(error);
+        }
+      });
+
+      document.getElementById('reset-btn').addEventListener('click', () => {
+        document.getElementById('product-form').reset();
+        document.getElementById('product-id').value = '';
+      });
+
+      // Categories management
+      async function fetchCategories() {
+        try {
+          const res = await fetch('backend/api/categories.php');
+          const categories = await res.json();
+          return categories;
+        } catch (error) {
+          console.error('Failed to fetch categories:', error);
+          return [];
+        }
+      }
+
+      async function fetchAndRenderCategories() {
+        const categories = await fetchCategories();
+        const categorySelect = document.getElementById('category_id');
+        categorySelect.innerHTML = '';
+        categories.forEach(cat => {
+          const option = document.createElement('option');
+          option.value = cat.id;
+          option.textContent = cat.name_fr;
+          categorySelect.appendChild(option);
+        });
+
+        const categoriesList = document.getElementById('categories-list');
+        categoriesList.innerHTML = '';
+        categories.forEach(cat => {
+          const div = document.createElement('div');
+          div.className = 'flex justify-between items-center p-2 border rounded';
+          div.innerHTML = `
+            <span>${cat.name_fr}</span>
+            <div class="space-x-2">
+              <button data-id="${cat.id}" class="edit-category bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600">Modifier</button>
+              <button data-id="${cat.id}" class="delete-category bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700">Supprimer</button>
+            </div>
+          `;
+          categoriesList.appendChild(div);
+        });
+        attachCategoryEventListeners();
+      }
+
+      function attachCategoryEventListeners() {
+        document.querySelectorAll('.edit-category').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            const id = e.target.getAttribute('data-id');
+            const categories = await fetchCategories();
+            const category = categories.find(c => c.id == id);
+            if (category) {
+              document.getElementById('category-id').value = category.id;
+              document.getElementById('category-name').value = category.name_fr;
+              navCategories.click();
+            }
+          });
+        });
+
+        document.querySelectorAll('.delete-category').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            const id = e.target.getAttribute('data-id');
+            if (confirm('Voulez-vous vraiment supprimer cette catégorie ?')) {
+              try {
+                const res = await fetch(`backend/api/categories.php?id=${id}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (data.success) {
+                  fetchAndRenderCategories();
+                } else {
+                  alert('Erreur lors de la suppression');
+                }
+              } catch (error) {
+                alert('Erreur lors de la suppression');
+                console.error(error);
+              }
+            }
+          });
+        });
+      }
+
+      document.getElementById('category-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('category-id').value;
+        const name = document.getElementById('category-name').value.trim();
+        if (!name) {
+          alert('Le nom de la catégorie est requis');
+          return;
+        }
+        try {
+          let res;
+          if (id) {
+            res = await fetch('backend/api/categories.php', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ id: parseInt(id), name })
+            });
+          } else {
+            res = await fetch('backend/api/categories.php', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ name })
+            });
+          }
+          const data = await res.json();
+          if (data.success) {
+            alert('Catégorie enregistrée avec succès');
+            document.getElementById('category-form').reset();
+            fetchAndRenderCategories();
+          } else {
+            alert('Erreur lors de l\'enregistrement');
+          }
+        } catch (error) {
+          alert('Erreur lors de l\'enregistrement');
+          console.error(error);
+        }
+      });
+
+      document.getElementById('reset-category-btn').addEventListener('click', () => {
+        document.getElementById('category-form').reset();
+      });
+
+      // Orders management
+      async function fetchOrders() {
+        try {
+          const res = await fetch('backend/api/orders.php');
+          const orders = await res.json();
+          return orders;
+        } catch (error) {
+          console.error('Failed to fetch orders:', error);
+          return [];
+        }
+      }
+
+      async function fetchAndRenderOrders() {
+        const orders = await fetchOrders();
+        const ordersList = document.getElementById('orders-list');
+        ordersList.innerHTML = '';
+        orders.forEach(order => {
+          const div = document.createElement('div');
+          div.className = 'border rounded p-4';
+          div.innerHTML = `
+            <p><strong>ID:</strong> ${order.id}</p>
+            <p><strong>Date:</strong> ${order.date}</p>
+            <p><strong>Status:</strong> ${order.status}</p>
+            <p><strong>Client:</strong> ${order.customer ? order.customer.name : ''}</p>
+            <p><strong>Produits:</strong></p>
+            <ul class="list-disc list-inside">
+              ${order.cart ? order.cart.map(item => `<li>${item.quantity} x ${item.size} ${item.color} (ID produit: ${item.id})</li>`).join('') : ''}
+            </ul>
+            <div class="mt-2 space-x-2">
+              <button data-id="${order.id}" class="update-order-status bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">Changer statut</button>
+              <button data-id="${order.id}" class="delete-order bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">Supprimer</button>
+            </div>
+          `;
+          ordersList.appendChild(div);
+        });
+        attachOrderEventListeners();
+      }
+
+      function attachOrderEventListeners() {
+        document.querySelectorAll('.update-order-status').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            const id = e.target.getAttribute('data-id');
+            const newStatus = prompt('Entrez le nouveau statut (pending, shipped, delivered, cancelled):');
+            if (newStatus) {
+              try {
+                const res = await fetch('backend/api/orders.php', {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ id: parseInt(id), status: newStatus })
+                });
+                const data = await res.json();
+                if (data.success) {
+                  alert('Statut mis à jour');
+                  fetchAndRenderOrders();
+                } else {
+                  alert('Erreur lors de la mise à jour');
+                }
+              } catch (error) {
+                alert('Erreur lors de la mise à jour');
+                console.error(error);
+              }
+            }
+          });
+        });
+
+        document.querySelectorAll('.delete-order').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            const id = e.target.getAttribute('data-id');
+            if (confirm('Voulez-vous vraiment supprimer cette commande ?')) {
+              try {
+                const res = await fetch(`backend/api/orders.php?id=${id}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (data.success) {
+                  fetchAndRenderOrders();
+                } else {
+                  alert('Erreur lors de la suppression');
+                }
+              } catch (error) {
+                alert('Erreur lors de la suppression');
+                console.error(error);
+              }
+            }
+          });
+        });
+      }
     });
   </script>
 </body>
