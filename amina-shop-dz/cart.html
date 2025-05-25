@@ -62,6 +62,12 @@
   </section>
 
   <script>
+    document.getElementById('checkout-btn').addEventListener('click', () => {
+      window.location.href = 'checkout.html';
+    });
+  </script>
+
+  <script>
     // Mobile menu toggle
     const menuBtn = document.getElementById('menu-btn');
     const mobileMenu = document.getElementById('mobile-menu');
@@ -151,7 +157,7 @@
       for (const item of cartItems) {
         const product = await fetchProduct(item.id);
         if (!product) continue;
-        const productName = currentLang === 'ar' ? product.name_ar : product.name_fr;
+        const productName = product.name;
         const itemTotal = product.price * item.quantity;
         total += itemTotal;
 
